@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+<input class='rdata' type='button' value='Add new account'
+ onclick="window.open('{{ url_for('add_pop3_account') }}', '_self')"/>
+<table>
+<tr>
+<th>Server name/description</th>
+<th>Username/email</th>
+<th>Hostname/IPv4 address[:port]</th>
+<th>Del</th>
+<th>Con</th>
+</tr>
+  {% for account in accounts %}
+     {% if (account.odd) %}<tr class='ts1'>{% else %}<tr>{% endif %}
+        <td>{{account.description}}</td>
+        <td>{{account.username}}</td>
+        <td>{{account.hostname}}</td>
+        <td><input type="image" src="{{ url_for('static', filename='delete.png') }}" onclick="window.print()"></td>
+        <td><input type="image" src="{{ url_for('static', filename='connect.png') }}" onclick="window.print()"></td>
+     </tr>
+  {% endfor %}
+</table>
+{% endblock %}

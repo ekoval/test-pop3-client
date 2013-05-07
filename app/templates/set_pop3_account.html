@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+<form action="{{ url_for('add_pop3_account') }}" method=post>
+<fieldset>
+<legend>Add new account</legend>
+    <label>Server description:</label><input class='idata' type='text' name='servername'
+           placeholder='Server name or brief description'/><br/>
+    <label>Hostname or IPv4:</label><input class='idata' type='text' name='hostname'
+           placeholder='Hostname or IPv4 address'/><br/>
+    <label>Port number:</label><input type='text' size="1" name='port' value='110'/><br/>
+    <label>Username:</label><input class='idata' type='text' name='account' value='postmaster'
+           placeholder='Account name or email address'/><br/>
+    <label>Password:</label><input class='idata' type='password' name='passwd'/><br /><br/>
+    <input class='sdata' type='button' value='Cancel'/>&nbsp;
+    <input class='sdata' type='submit' value='Submit'/>&nbsp;
+    <input class='sdata' type='button' value='Test'/>
+</fieldset>
+</form>
+{% endblock %}

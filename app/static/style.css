@@ -1,0 +1,63 @@
+body              { font-family: sans-serif; background: #eee; }
+a, h1, h2, legend { color: #377BA8; }
+h1, h2,th, td     { font-family: 'Georgia', serif; margin: 0; }
+legend, label     { font-size: 1.1em; font-family: 'Georgia', serif; margin: 0; }
+h1                { border-bottom: 2px solid #eee; }
+h2                { font-size: 1.2em; }
+
+.page             { margin: 2em auto; width: 65em; border: 5px solid #ccc;
+                    padding: 0.8em; background: white; }
+.entries          { list-style: none; margin: 0; padding: 0; }
+.entries li       { margin: 0.8em 1.2em; }
+.entries li h2    { margin-left: -1em; }
+.add-entry        { font-size: 0.9em; border-bottom: 1px solid #ccc; }
+.add-entry dl     { font-weight: bold; }
+.metanav          { text-align: right; font-size: 0.8em; padding: 0.3em;
+                    margin-bottom: 1em; background: #fafafa; }
+.flash            { background: #CEE5F5; padding: 0.5em;
+                    border: 1px solid #AACBE2; }
+.error            { background: #F0D6D6; padding: 0.5em; }
+
+form              { margin-left:auto; margin-right:auto; width:50%; }
+label             { clear: both; float: left; width: 35%;}
+input.idata       { float: left; width: 55%;}
+input.sdata       { float: left; width: 30%; margin: 1;}
+input.rdata       { float: right; width: 30%; margin: 1; padding:4px;}
+
+table, th, td     { border-style:solid; border-width:1px; border-collapse:collapse; padding:4px; }
+table             { margin-left:auto; margin-right:auto; width:100%; }
+th                { height:28px; background-color:#eeeffb; color:#377BA8; border-color:black; }
+.ts1              {background-color:#eeeffb;}
+
+[type='button'], [type='submit'] {
+    display:inline;
+    -moz-box-shadow:inset 0px 1px 0px 0px #fff6af;
+    -webkit-box-shadow:inset 0px 1px 0px 0px #fff6af;
+    box-shadow:inset 0px 1px 0px 0px #fff6af;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, white), color-stop(1, #b3bef5) );
+    background:-moz-linear-gradient( center top, white 5%, #67ABD8 100% );
+    background-color:#ffec64;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid gray;
+    display:inline-block;
+    color:#333333;
+    font-family:arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:1px 1px 0px white;
+}
+
+[type='button']:hover, [type='submit']:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, white), color-stop(1, #ffec64) );
+    background:-moz-linear-gradient( center top, white 5%, gray 100% );
+    background-color:#f3b415;
+}
+
+[type='button']:active, [type='submit']:active {
+    position:relative;
+    top:1px;
+}
