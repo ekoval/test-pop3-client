@@ -9,6 +9,7 @@ function post(path, user, host) {
     field.attr("type", "hidden");
     field.attr("name", "account");
     field.attr("value", user);
+    form.append(field);
 
     field = $('<input></input>');
     field.attr("type", "hidden");

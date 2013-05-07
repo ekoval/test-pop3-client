@@ -8,6 +8,7 @@
 """
 
 import re
+from collections import namedtuple
 
 #Interesting mail headers by categories in the descending order
 #from the point of view of more strict correspondence of
@@ -15,6 +16,32 @@ import re
 SNDR_HDRS = ['From:', 'Sender:', 'Originator:', 'Return-Path:']
 SUBJ_HDRS = ['Subject:', 'Keywords:', 'Comments:', 'Summary:']
 DATE_HDRS = ['Date:', 'Delivery-Date:', 'Received:']
+
+def _parse_header(header, keys):
+    """Internal helper function for parse_header() call"""
+    for entry in header:
+        regexes = [ re.compile(pattern + " *(.*$)") for pattern in keys ]
+        for regex in regexes:
+            match = regex.search(entry)
+            if match:
+                return match.group(1)
+
+def parse_header(msgid, header, odd):
+    """Helper function, which return named tuple of three fields,
+    ('sender', 'subject', 'date'), from received header.
+    """
+    _sender = _parse_header(header, SNDR_HDRS)
+    _subject = _parse_header(header, SUBJ_HDRS)
+    _date = _parse_header(header, DATE_HDRS)
+    regex = re.compile("\(.*\); *(.*$)")
+    _found = regex.search(_date)
+    if _found and _found.group(1):
+        _date = _found.group(1)
+
+    _headinfo = namedtuple('_headinfo', 'msgid, odd, sender, subject, date')
+    return _headinfo(msgid=msgid, odd=odd,sender=_sender,
+                     subject=_subject, date=_date)
+
 
 PINFO_APP_ERROR = 1001
 PINFO_APP_VALIDATOR_ERROR = 1002
@@ -42,6 +69,7 @@ STATUS_DESC = {
 class PInfoBaseError(Exception):
     """Base class for all custom application errors."""
     code = PINFO_APP_ERROR
+
 
 class PInfoValidationError(PInfoBaseError):
     """Contact information validation error"""

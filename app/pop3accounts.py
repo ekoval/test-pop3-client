@@ -34,7 +34,7 @@ class Eboxes(db.Model):
     srv = db.relationship(
         'Servers', backref=db.backref('accounts', cascade="all,delete"),
         single_parent=True)
-    user = db.Column(db.String(20), index=True, nullable=False)
+    user = db.Column(db.String(40), index=True, nullable=False)
     passwd = db.Column(db.String(20), nullable=False)
 
 
@@ -71,25 +71,26 @@ class POP3Info():
 
         return _result
 
-    def get_account(self, user, host, port=None):
+    def get_account(self, user, host):
         """Retrieve pop3 account, if it is present.
 
         :user: account name or mail address
-        :host: host name or IPv4 address
-        :port: port number, if not default value
+        :host: host name or IPv4 address plus port number separated by ':', if
+        not default
         :returns: tuple of account info or None, if absent
         """
+        if host.count(':'):
+            host, port = host.split(':')
+        else:
+            port = 110
         _data = self._get_account(user, host, port)
         if not _data:
             return None
 
-        _info = namedtuple('_info', 'username hostname description')
-        if _data[0].port and _data[0].port != 110:
-            _data[0].hostname += ':' + str(_data[0].port)
+        _info = namedtuple('_info', 'username, password, hostname, port')
         return _info(
-            username = _data[1].user + ':' + _data[1].passwd,
-            hostname = _data[0].hostname,
-            description = _data[0].description if _data[0].description else '')
+            username = user, password = _data[1].passwd,
+            hostname = host, port = port)
 
     def add_account(self, user, host, passwd, port=None, description=None):
         """Add pop3 account.

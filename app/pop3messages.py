@@ -71,11 +71,12 @@ class POP3Client():
         subject and submit/receive date of the message. Function
         works as a generator.
         """
+        i = 0
         for id in imap(lambda x: x.split(' ')[0], self.mails):
             resp, header, octets = self.pop3.top(id, 0)
             if not self.rstatus.search(resp):
                 continue
-            yield helpers.parse_header(header)
+            yield helpers.parse_header(id, header, ++i%2)
 
     def quit(self):
         if self.pop3:
