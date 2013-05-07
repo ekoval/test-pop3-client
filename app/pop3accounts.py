@@ -51,7 +51,7 @@ class POP3Info():
         """
         if not db.session.query(Servers, Eboxes).\
             outerjoin(Servers.accounts).first():
-            return None
+            return []
 
         _query = db.session.query(Servers, Eboxes).\
             outerjoin(Servers.accounts).\

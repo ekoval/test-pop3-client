@@ -1,6 +1,14 @@
 <!doctype html>
-<title>POP3 mail accounts</title>
+<html>
+<head>
+<script type="text/javascript"
+    src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='scripts.js') }}"></script>
+<title>POP3 mail storage</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 <div class=page>
   <h1>POP3 mail storage</h1>
   {% for message in get_flashed_messages() %}
@@ -8,3 +16,5 @@
   {% endfor %}
   {% block body %}{% endblock %}
 </div>
+</body>
+</html>

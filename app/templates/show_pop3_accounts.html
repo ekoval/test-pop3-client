@@ -15,8 +15,10 @@
         <td>{{account.description}}</td>
         <td>{{account.username}}</td>
         <td>{{account.hostname}}</td>
-        <td><input type="image" src="{{ url_for('static', filename='delete.png') }}" onclick="window.print()"></td>
-        <td><input type="image" src="{{ url_for('static', filename='connect.png') }}" onclick="window.print()"></td>
+        <td><input type="image" src="{{ url_for('static', filename='delete.png') }}"
+            onclick="post('{{ url_for('pop3_accounts_list') }}', '{{account.username}}', '{{account.hostname}})'"></td>
+        <td><input type="image" src="{{ url_for('static', filename='connect.png') }}"
+            onclick="post('{{ url_for('messages_headers') }}', '{{account.username}}', '{{account.hostname}})'"></td>
      </tr>
   {% endfor %}
 </table>
