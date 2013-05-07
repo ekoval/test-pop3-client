@@ -1,4 +1,3 @@
-<script type='text/javascript'>
 // Post to the provided URL with the specified parameters.
 function post(path, user, host) {
     var form = $('<form></form>');
@@ -10,7 +9,6 @@ function post(path, user, host) {
     field.attr("type", "hidden");
     field.attr("name", "account");
     field.attr("value", user);
-    form.append(field);
 
     field = $('<input></input>');
     field.attr("type", "hidden");
@@ -23,4 +21,3 @@ function post(path, user, host) {
     $(document.body).append(form);
     form.submit();
 }
-</script>
