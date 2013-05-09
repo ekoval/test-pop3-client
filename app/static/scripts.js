@@ -1,24 +1,63 @@
-// Post to the provided URL with the specified parameters.
-function post(path, user, host) {
-    var form = $('<form></form>');
-    var field = $('<input></input>');
+$(document).ready(function() {
+    $('button[name="delacc"]').bind('click', function() {
+        var id = $('button[name="delacc"]').val();
 
-    form.attr("method", "post");
-    form.attr("action", path);
+        $.getJSON($SCRIPT_ROOT + '/delaccount', {
+           username: $('u'+id).val(),
+           hostname: $('h'+id).val(),
+           }, function(data) {
+             $("estatus").text(data.result);
+        });
+        return false;
+    });
 
-    field.attr("type", "hidden");
-    field.attr("name", "account");
-    field.attr("value", user);
-    form.append(field);
+    $('button[name="connacc"]').bind('click', function() {
+        var id = $('button[name="delacc"]').val();
+        var field = $('<input></input>');
+        var form = $('<form></form>');
+        var user = $('u'+id).val();
+        var host = $('h'+id).val();
+        var port = '110';
 
-    field = $('<input></input>');
-    field.attr("type", "hidden");
-    field.attr("name", "hostname");
-    field.attr("value", host);
-    form.append(field);
+        if (host.indexOf(":") > -1) {
+            var arr = host.split(":");
+            host = arr[0];
+            port = arr[1];
+        }
 
-    // The form needs to be a part of the document in
-    // order for us to be able to submit it.
-    $(document.body).append(form);
-    form.submit();
-}
+        var data = [["account",user],["hostname",host],["port",port]];
+
+        form.attr("method", "post");
+        form.attr("action", $SCRIPT_ROOT + '/headers');
+
+        for (var i = 0; i < b.length; i++)
+        {
+            field = $('<input></input>');
+            field.attr("type", "hidden");
+            field.attr("name", data[0]);
+            field.attr("value", data[1]);
+            form.append(field);
+        }
+
+        $(document.body).append(form);
+        form.submit();
+    }
+
+    $('input[name="testacc"]').bind('click', function() {
+        var user = $('input#u0').val();
+        var host = $('input#h0').val();
+        var port = $('input#p0').val();
+
+        if (port && port != 110) {
+            host = host+':'+port;
+        }
+
+        $.getJSON($SCRIPT_ROOT + '/testaccount', {
+           username: user,
+           hostname: host,
+           }, function(data) {
+             $("#estatus").text(data.result);
+        });
+        return false;
+    });
+});

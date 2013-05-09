@@ -11,14 +11,22 @@
 <th>Con</th>
 </tr>
   {% for account in accounts %}
-     {% if (account.odd) %}<tr class='ts1'>{% else %}<tr>{% endif %}
+     {% if (account.id % 2) %}<tr class='ts1'>{% else %}<tr>{% endif %}
         <td>{{account.description}}</td>
-        <td>{{account.username}}</td>
-        <td>{{account.hostname}}</td>
-        <td><input type="image" src="{{ url_for('static', filename='delete.png') }}"
-            onclick="post('{{ url_for('pop3_accounts_list') }}', '{{account.username}}', '{{account.hostname}}')"></td>
-        <td><input type="image" src="{{ url_for('static', filename='connect.png') }}"
-            onclick="post('{{ url_for('messages_headers') }}', '{{account.username}}', '{{account.hostname}}')"></td>
+        <td id="u{{account.id}}">{{account.username}}</td>
+        <td id="h{{account.id}}">{{account.hostname}}
+          {% if (account.port and account.port != 110) %}
+             :{{account.port}}
+          {% endif %}
+        </td>
+        <td><button type="submit" name="delacc" value="{{account.id}}">
+            <img src="{{ url_for('static', filename='delete.png') }}"
+             alt="Delete account"></button>
+        </td>
+        <td><button type="submit" name="connacc" value="{{account.id}}">
+            <img src="{{ url_for('static', filename='connect.png') }}"
+             alt="Get account header messages"></button>
+        </td>
      </tr>
   {% endfor %}
 </table>

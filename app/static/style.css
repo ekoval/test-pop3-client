@@ -29,12 +29,12 @@ table             { margin-left:auto; margin-right:auto; width:100%; }
 th                { height:28px; background-color:#eeeffb; color:#377BA8; border-color:black; }
 .ts1              {background-color:#eeeffb;}
 
-[type='button'], [type='submit'] {
+[type='button'], [type='submit'], [type='reset'] {
     display:inline;
     -moz-box-shadow:inset 0px 1px 0px 0px #fff6af;
     -webkit-box-shadow:inset 0px 1px 0px 0px #fff6af;
     box-shadow:inset 0px 1px 0px 0px #fff6af;
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, white), color-stop(1, #b3bef5) );
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, white), color-stop(1, #67ABD8) );
     background:-moz-linear-gradient( center top, white 5%, #67ABD8 100% );
     background-color:#ffec64;
     -moz-border-radius:6px;
@@ -48,16 +48,17 @@ th                { height:28px; background-color:#eeeffb; color:#377BA8; border
     font-weight:bold;
     padding:6px 24px;
     text-decoration:none;
-    text-shadow:1px 1px 0px white;
-}
+    text-shadow:1px 1px 0px white; }
 
-[type='button']:hover, [type='submit']:hover {
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, white), color-stop(1, #ffec64) );
+[type='button']:hover, [type='submit']:hover, [type='reset']:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, white), color-stop(1, gray) );
     background:-moz-linear-gradient( center top, white 5%, gray 100% );
-    background-color:#f3b415;
-}
+    background-color:#f3b415; }
 
-[type='button']:active, [type='submit']:active {
+[type='button']:active, [type='submit']:active, [type='reset']:active {
     position:relative;
-    top:1px;
-}
+    top:1px; }
+
+.iflash, .eflash { background: #CEE5F5; padding: 0.5em;
+                   border: 1px solid #AACBE2; }
+.eflash          { color: red; }

@@ -3,17 +3,36 @@
 <form action="{{ url_for('add_pop3_account') }}" method=post>
 <fieldset>
 <legend>Add new account</legend>
-    <label>Server description:</label><input class='idata' type='text' name='servername'
-           placeholder='Server name or brief description'/><br/>
-    <label>Hostname or IPv4:</label><input class='idata' type='text' name='hostname'
-           placeholder='Hostname or IPv4 address'/><br/>
-    <label>Port number:</label><input type='text' size="1" name='port' value='110'/><br/>
-    <label>Username:</label><input class='idata' type='text' name='account' value='postmaster'
-           placeholder='Account name or email address'/><br/>
-    <label>Password:</label><input class='idata' type='password' name='passwd'/><br /><br/>
-    <input class='sdata' type='button' value='Cancel'/>&nbsp;
-    <input class='sdata' type='submit' value='Submit'/>&nbsp;
-    <input class='sdata' type='button' value='Test'/>
+
+<form method="POST" action="/login">
+    {{ form.servername.label }} {{ form.servername(class_="idata", placeholder="Server name or brief description") }}
+    {% if form.servername.errors %}
+        <ul class="errors">{% for error in form.servername.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {{ form.hostname.label }} {{ form.hostname(class_="idata", id="h0", placeholder="Hostname or IPv4 address") }}
+    {% if form.hostname.errors %}
+        <ul class="errors">{% for error in form.hostname.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {{ form.port.label }} {{ form.port(id="p0", size="1", value="110") }}
+    {% if form.port.errors %}
+        <ul class="errors">{% for error in form.port.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {{ form.account.label }} {{ form.account(class_="idata", id="u0", placeholder="Account name or email address") }}
+    {% if form.account.errors %}
+        <ul class="errors">{% for error in form.account.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {{ form.passwd.label }} {{ form.passwd(class_="idata") }}
+    {% if form.passwd.errors %}
+        <ul class="errors">{% for error in form.passwd.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <input class="sdata" type="reset" value="Cancel">&nbsp;
+    {{ form.submit(class_="sdata") }}&nbsp;
+    <input class="sdata" type="submit" name="testacc" value="Test">
 </fieldset>
 </form>
 {% endblock %}

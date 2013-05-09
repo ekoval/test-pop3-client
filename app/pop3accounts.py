@@ -9,8 +9,6 @@
 from collections import namedtuple
 
 from app import db
-from helpers import AccountDoesNotExist, \
-                    AccountAlreadyExists
 
 class Servers(db.Model):
     """POP3 server information, where hostname and port fields pair are
@@ -57,7 +55,7 @@ class POP3Info():
             outerjoin(Servers.accounts).\
             limit(limit).offset(offset)
 
-        _info = namedtuple('_info', 'description hostname username odd')
+        _info = namedtuple('_info', 'description hostname username id')
         _result = []
         for _i, _data in enumerate(_query.all()):
            if _data[0].port and _data[0].port != 110:
@@ -67,23 +65,19 @@ class POP3Info():
                description = _data[0].description if _data[0].description else '',
                hostname = _data[0].hostname,
                username = _data[1].user,
-               odd=_i%2))
+               id=_i))
 
         return _result
 
-    def get_account(self, user, host):
+    def get_account(self, user, host, port):
         """Retrieve pop3 account, if it is present.
 
         :user: account name or mail address
-        :host: host name or IPv4 address plus port number separated by ':', if
-        not default
+        :host: host name or IPv4 address
+        :port: port number
         :returns: tuple of account info or None, if absent
         """
-        if host.count(':'):
-            host, port = host.split(':')
-        else:
-            port = 110
-        _data = self._get_account(user, host, port)
+        _data = self._get_account(user, host, port=110)
         if not _data:
             return None
 
@@ -100,10 +94,10 @@ class POP3Info():
         :passwd: plaintext account password
         :port: port number, if not default value
         :description: server name/description, if present
-        :returns: operation status code.
+        :returns: True, if success.
         """
         if self._get_account(user, host, port):
-            raise AccountAlreadyExists
+            return False
 
         _server = self._get_host(host, port)
         if not _server:
@@ -117,30 +111,7 @@ class POP3Info():
         _server.accounts.append(_account)
         db.session.add(_server)
         db.session.commit()
-
-    def update_account(self, user, host, passwd=None, port=None, description=None):
-        """Update pop3 account. Only password or server description
-        may be changed here.
-
-        :user: account name or mail address
-        :passwd: plaintext account password
-        :host: host name or IPv4 address
-        :port: port number, if not default value
-        :description: server name/description, if present
-        :returns: operation status code.
-        """
-        _data = self._get_account(user, host, port)
-        if not _data:
-            raise AccountDoesNotExist
-
-        if description:
-            _data[0].description = description
-        if passwd:
-            _data[1].passwd = passwd
-
-        _data[0].accounts.append(_data[1])
-        db.session.add(_data[0])
-        db.session.commit()
+        return True
 
     def del_account(self, user, host, port=None):
         """Delete pop3 account.
@@ -148,20 +119,22 @@ class POP3Info():
         :user: account name or mail address
         :host: host name or IPv4 address
         :port: port number, if not default value
-        :returns: operation status code.
+        :returns: True, if success.
         """
         _data = self._get_account(user, host, port)
         if not _data:
-            raise AccountDoesNotExist
+            return False
 
         db.session.delete(_data[1])
-        _data = db.session.query(Servers).\
+        #If account references absent, delete host entry too
+        if db.session.query(Servers, Eboxes).\
+            outerjoin(Servers.accounts).\
             filter(Servers.hostname == host).\
             filter(Servers.port == port).\
-            first()
-        if _data:
-            db.session.delete(_data)
+            first():
+            db.session.delete(_data[0])
         db.session.commit()
+        return True
 
     def _get_account(self, user, host, port=None):
         return db.session.query(Servers, Eboxes).\
