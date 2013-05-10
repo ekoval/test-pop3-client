@@ -5,4 +5,4 @@ from app import app, db
 
 db.create_all()        # For testing purposes, if table exists, skipped
 
-app.run(debug = True)
+app.run(debug = True, host='0.0.0.0')

@@ -84,6 +84,7 @@ def del_pop3_account():
         pass
     pop3 = POP3Info()
     rc = pop3.del_account(user, host, port)
+    print "HERE", user, host, port, rc
     return jsonify(result=rc)
 
 

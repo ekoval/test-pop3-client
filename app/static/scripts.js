@@ -1,22 +1,19 @@
 $(document).ready(function() {
-    $('button[name="delacc"]').bind('click', function() {
-        var id = $('button[name="delacc"]').val();
-
+    $('input[name="delacc"]').bind('click', function() {
         $.getJSON($SCRIPT_ROOT + '/delaccount', {
-           username: $('u'+id).val(),
-           hostname: $('h'+id).val(),
+           username: this.parentNode.parentNode.childNodes[3].innerHTML,
+           hostname: this.parentNode.parentNode.childNodes[5].innerHTML,
            }, function(data) {
              $("estatus").text(data.result);
         });
         return false;
     });
 
-    $('button[name="connacc"]').bind('click', function() {
-        var id = $('button[name="delacc"]').val();
+    $('input[name="connacc"]').bind('click', function() {
+        var user = this.parentNode.parentNode.childNodes[3].innerHTML;
+        var host = this.parentNode.parentNode.childNodes[5].innerHTML;
         var field = $('<input></input>');
         var form = $('<form></form>');
-        var user = $('u'+id).val();
-        var host = $('h'+id).val();
         var port = '110';
 
         if (host.indexOf(":") > -1) {
@@ -44,9 +41,9 @@ $(document).ready(function() {
     });
 
     $('input[name="testacc"]').bind('click', function() {
-        var user = $('input#u0').val();
-        var host = $('input#h0').val();
-        var port = $('input#p0').val();
+        var user = document.getElementById("u0").value;
+        var host = document.getElementById("h0").value;
+        var port = document.getElementById("p0").value;
 
         if (port && port != 110) {
             host = host+':'+port;
