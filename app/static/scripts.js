@@ -41,7 +41,7 @@ $(document).ready(function() {
 
         $(document.body).append(form);
         form.submit();
-    }
+    });
 
     $('input[name="testacc"]').bind('click', function() {
         var user = $('input#u0').val();
