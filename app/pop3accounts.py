@@ -125,13 +125,16 @@ class POP3Info():
         if not _data:
             return False
 
-        db.session.delete(_data[1])
-        #If account references absent, delete host entry too
-        if db.session.query(Servers, Eboxes).\
+        #If host contains the only account references,
+        #it must be deleted too
+        _count = db.session.query(Servers, Eboxes).\
             outerjoin(Servers.accounts).\
             filter(Servers.hostname == host).\
-            filter(Servers.port == port).\
-            first():
+            filter(Servers.port == port).count()
+
+        if _count > 1:
+            db.session.delete(_data[1])
+        else:
             db.session.delete(_data[0])
         db.session.commit()
         return True

@@ -10,7 +10,8 @@
 from flask import render_template, request, \
     redirect, url_for, flash, jsonify
 from flask.ext.wtf import Form, TextField, \
-    validators, PasswordField, IntegerField, SubmitField
+    validators, PasswordField, IntegerField, \
+    SubmitField, HiddenField
 from wtforms.validators import ValidationError
 
 from app import app
@@ -25,6 +26,19 @@ def HostNameCheck(form, field):
 
 
 class MngAccountForm(Form):
+    account = HiddenField("Username:",
+        [validators.InputRequired(message="Account field is obligatory"),
+         validators.Length(max=40, message="Account name is too long")])
+    hostname = HiddenField("Hostname or IPv4:",
+        [validators.InputRequired(message="Hostname field is obligatory"),
+         validators.Length(max=20, message="Hostname is too long"),
+         HostNameCheck])
+    port = IntegerField("Port number:",
+        [validators.NumberRange(min=1, max=65535, message="Incorrect port number")],
+        default=110)
+
+
+class AddAccountForm(Form):
     account = TextField("Username:",
         [validators.InputRequired(message="Account field is obligatory"),
          validators.Length(max=40, message="Account name is too long")])
@@ -35,9 +49,6 @@ class MngAccountForm(Form):
     port = IntegerField("Port number:",
         [validators.NumberRange(min=1, max=65535, message="Incorrect port number")],
         default=110)
-
-
-class AddAccountForm(MngAccountForm):
     servername = TextField("Server description:",
         [validators.Length(max=40, message="Server name is too long")])
     passwd = PasswordField("Password:",
@@ -72,44 +83,32 @@ def add_pop3_account():
     return render_template('set_pop3_account.html', form=form)
 
 
-@app.route('/delaccount', methods=['GET'])
+@app.route('/delaccount', methods=['POST'])
 def del_pop3_account():
-    user = request.args.get('username', '', type=str)
-    host = request.args.get('hostname', '', type=str)
-    port = "110"
-
-    try:
-        host, port = host.index(":")
-    except ValueError:
-        pass
-    pop3 = POP3Info()
-    rc = pop3.del_account(user, host, port)
-    print "HERE", user, host, port, rc
-    return jsonify(result=rc)
-
-
-@app.route('/testaccount', methods=['GET'])
-def test_pop3_account():
-    user = request.args.get('username', '', type=str)
-    host = request.args.get('hostname', '', type=str)
-    port = "110"
-
-    try:
-        host, port = host.index(":")
-    except ValueError:
-        pass
-    pop3 = POP3Info()
-    account = pop3.get_account(user, host, port)
-    client = POP3Client(
-            account.username, account.password,
-            account.hostname, account.port)
-    rc = client.connect()
-    return jsonify(result=rc)
+    form = MngAccountForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        host = form.hostname.data
+        port = "110"
+        try:
+            host, port = host.index(":")
+        except ValueError:
+            pass
+        pop3 = POP3Info()
+        result = pop3.del_account(form.account.data, host, port)
+        if result:
+            flash("Deleted account '{0}' for '{1}'!".format(
+                form.account.data, host), 'info')
+        else:
+            flash("'Account {0}' for '{1} does not exist'!".format(
+                form.account.data, host), 'error')
+    else:
+        flash("Not valid form data!", 'error')
+    return redirect(url_for('pop3_accounts_list'))
 
 
 @app.route('/headers', methods=['GET', 'POST'])
 def messages_headers():
-    form = MngAccountForm()
+    form = MngAccountForm(csrf_enabled=False)
     headers = []
     if form.validate_on_submit():
         pop3 = POP3Info()
@@ -134,4 +133,26 @@ def messages_headers():
             flash("Getting headers for '{0}' account on '{1}' failed: {2}".format(
                 form.account.data, form.hostname.data, result), 'error')
             return redirect(url_for('pop3_accounts_list'))
+    else:
+        flash("Not valid form data!", 'error')
+        return render_template('show_pop3_accounts.html')
     return render_template('show_pop3_messages.html', headers=headers)
+
+
+@app.route('/testaccount', methods=['GET'])
+def test_pop3_account():
+    user = request.args.get('username', '', type=str)
+    host = request.args.get('hostname', '', type=str)
+    port = "110"
+
+    try:
+        host, port = host.index(":")
+    except ValueError:
+        pass
+    pop3 = POP3Info()
+    account = pop3.get_account(user, host, port)
+    client = POP3Client(
+            account.username, account.password,
+            account.hostname, account.port)
+    rc = client.connect()
+    return jsonify(result=rc)
