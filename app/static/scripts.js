@@ -5,13 +5,15 @@ $(document).ready(function() {
         var port = '110';
 
         if (host.indexOf(":") > -1) {
-            host, port = host.split(":");
+            var array = host.split(":");
+            host = array[0];
+            port = array[1];
         }
 
         var data = [["account",user],["hostname",host],["port",port]];
 
         form.attr("method", "post");
-        form.attr("action", $SCRIPT_ROOT + '/delaccount');
+        form.attr("action", $SCRIPT_ROOT + uri);
 
         for (var i = 0; i < data.length; i++)
         {
@@ -44,17 +46,26 @@ $(document).ready(function() {
         var user = document.getElementById("u0").value;
         var host = document.getElementById("h0").value;
         var port = document.getElementById("p0").value;
+        var pswd = document.getElementById("s0").value;
 
-        if (port && port != 110) {
-            host = host+':'+port;
-        }
-
-        $.getJSON($SCRIPT_ROOT + '/testaccount', {
-           username: user,
+        $.post($SCRIPT_ROOT + '/testaccount', {
+           account: user,
            hostname: host,
-           }, function(data) {
-             $("#estatus").text(data.result);
+           port: port,
+           passwd: pswd,
+           }, function(data, rc) {
+              var result = 'Set form parameters provide valid POP3 connection!'
+              var tagid = ['#istatus', '#estatus'];
+
+              if (data.result != "OK") {
+                result = data.result;
+                tagid = ['#estatus', '#istatus'];
+              }
+              $(tagid[0]).css({'display':'block'});
+              $(tagid[0]).html(result);
+              $(tagid[1]).css({'display':'none'});
         });
+
         return false;
     });
 });

@@ -57,6 +57,7 @@ th                { height:28px; background-color:#eeeffb; color:#377BA8; border
     position:relative;
     top:1px; }
 
-.iflash, .eflash { background: #CEE5F5; padding: 0.5em;
-                   border: 1px solid #AACBE2; }
-.eflash          { color: red; }
+.iflash, .eflash, #istatus, #estatus {
+                    background: #CEE5F5; padding: 0.5em;
+                    border: 1px solid #AACBE2; }
+.eflash, #estatus { color: red; }

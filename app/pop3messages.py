@@ -9,10 +9,12 @@
 """
 
 import re
-import socket
-from poplib import POP3, error_proto
+import functools
+from poplib import POP3
 from collections import namedtuple
 from itertools import imap
+
+from flask import jsonify
 
 DEFAULT_PORT = 110
 CONN_TIMEOUT = 3
@@ -33,6 +35,7 @@ def _parse_header(header, keys):
             if match:
                 return match.group(1)
 
+
 def parse_header(msgid, header, odd):
     """Helper function, which return named tuple of three fields,
     ('sender', 'subject', 'date'), from received header.
@@ -49,6 +52,7 @@ def parse_header(msgid, header, odd):
     return _headinfo(msgid=msgid, odd=odd,sender=_sender,
                      subject=_subject, date=_date)
 
+
 class POP3Client():
     """POP3 client wrapper for getting specific header information"""
 
@@ -58,37 +62,18 @@ class POP3Client():
         self.host = host
         self.port = port
         self.pop3 = None
-        self.rstatus = re.compile("^\+OK")
         self.mails = []
 
     def connect(self):
         """POP3 clien connection call."""
-        error = None
-        try:
-            self.pop3 = POP3(self.host, self.port, CONN_TIMEOUT)
-        except (socket.error, socket.herror,
-            socket.gaierror, socket.timeout) as error:
-            return error.strerror
-        except error_proto:
-            return error
-        except Exception:
-            return "Internal error!"
+        self.pop3 = POP3(self.host, self.port, CONN_TIMEOUT)
+        self.pop3.user(self.user)
+        self.pop3.pass_(self.passwd)
 
-        resp = self.pop3.user(self.user)
-        if not self.rstatus.search(resp):
-            return resp
-
-        resp = self.pop3.pass_(self.passwd)
-        if not self.rstatus.search(resp):
-            return resp
-        return "OK"
 
     def list(self):
         """Store list of available message ids on the server."""
         resp, self.mails, octets = self.pop3.list()
-        if not self.rstatus.search(resp):
-            return resp
-        return "OK"
 
     def msginfo(self):
         """Get tuple of header information, including sender, 
@@ -98,10 +83,18 @@ class POP3Client():
         i = 0
         for id in imap(lambda x: x.split(' ')[0], self.mails):
             resp, header, octets = self.pop3.top(id, 0)
-            if not self.rstatus.search(resp):
-                continue
             yield parse_header(id, header, ++i%2)
 
     def quit(self):
         if self.pop3:
             self.pop3.quit()
+
+
+def jsonify_response(func):
+    """Decorator, which jsonify function returned value
+    in special manner.
+    """
+    @functools.wraps(func)
+    def decorated_view(*args, **kwargs):
+        return jsonify({'result': func(*args, **kwargs)})
+    return decorated_view

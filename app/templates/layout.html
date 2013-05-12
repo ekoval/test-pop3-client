@@ -16,11 +16,10 @@
 <body>
 <div class=page>
   <h1>POP3 mail accounts</h1>
+  <div id= "istatus" style="display:none;"></div><div id= "estatus" style="display:none;"></div>
   {% for category, message in get_flashed_messages(with_categories=true) %}
     <div class= {% if (category == 'info') %}"iflash"{% else %}"eflash"{% endif %}>{{ message }}</div>
   {% endfor %}
-  <div class= "istatus"></div>
-  <div class= "estatus"></div>
   {% block body %}{% endblock %}
 </div>
 </body>
