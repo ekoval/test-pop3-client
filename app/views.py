@@ -129,7 +129,7 @@ def messages_headers():
         except error_proto as error:
             result = str(error)
         except socket.error as error:
-            result = error.strerror
+            result = 'host connection error!'
         except (socket.herror, socket.gaierror) as error:
             result = 'host addressing error!'
         except socket.timeout as error:
