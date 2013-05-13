@@ -40,17 +40,17 @@ def parse_header(msgid, header, odd):
     """Helper function, which return named tuple of three fields,
     ('sender', 'subject', 'date'), from received header.
     """
-    _sender = _parse_header(header, SNDR_HDRS)
-    _subject = _parse_header(header, SUBJ_HDRS)
-    _date = _parse_header(header, DATE_HDRS)
+    sender = _parse_header(header, SNDR_HDRS)
+    subject = _parse_header(header, SUBJ_HDRS)
+    date = _parse_header(header, DATE_HDRS)
     regex = re.compile("\(.*\); *(.*$)")
-    _found = regex.search(_date)
-    if _found and _found.group(1):
-        _date = _found.group(1)
+    found = regex.search(date)
+    if found and found.group(1):
+        date = found.group(1)
 
-    _headinfo = namedtuple('_headinfo', 'msgid, odd, sender, subject, date')
-    return _headinfo(msgid=msgid, odd=odd,sender=_sender,
-                     subject=_subject, date=_date)
+    headinfo = namedtuple('headinfo', 'msgid, odd, sender, subject, date')
+    return headinfo(msgid=msgid, odd=odd,sender=sender,
+                     subject=subject, date=date)
 
 
 class POP3Client():
