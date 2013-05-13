@@ -7,6 +7,7 @@
 
 """
 from collections import namedtuple
+from sqlalchemy import and_
 
 from app import db
 
@@ -48,26 +49,26 @@ class POP3Info():
         accounts information
         """
         if not db.session.query(Servers, Eboxes).\
-            outerjoin(Servers.accounts).first():
+            join(Servers.accounts).first():
             return []
 
-        _query = db.session.query(Servers, Eboxes).\
-            outerjoin(Servers.accounts).\
+        query = db.session.query(Servers, Eboxes).\
+            join(Servers.accounts).\
             limit(limit).offset(offset)
 
-        _info = namedtuple('_info', 'description hostname username id')
-        _result = []
-        for _i, _data in enumerate(_query.all()):
-           if _data[0].port and _data[0].port != 110:
-               _data[0].hostname += ':' + str(_data[0].port)
+        info = namedtuple('info', 'description hostname username id')
+        result = []
+        for i, data in enumerate(query.all()):
+           if data[0].port and data[0].port != 110:
+               data[0].hostname += ':' + str(data[0].port)
 
-           _result.append(_info(
-               description = _data[0].description if _data[0].description else '',
-               hostname = _data[0].hostname,
-               username = _data[1].user,
-               id=_i))
+           result.append(info(
+               description = data[0].description if data[0].description else '',
+               hostname = data[0].hostname,
+               username = data[1].user,
+               id=i))
 
-        return _result
+        return result
 
     def get_account(self, user, host, port):
         """Retrieve pop3 account, if it is present.
@@ -77,13 +78,13 @@ class POP3Info():
         :port: port number
         :returns: tuple of account info or None, if absent
         """
-        _data = self._get_account(user, host, port=110)
-        if not _data:
+        data = self._get_account(user, host, port=110)
+        if not data:
             return None
 
-        _info = namedtuple('_info', 'username, password, hostname, port')
-        return _info(
-            username = user, password = _data[1].passwd,
+        info = namedtuple('info', 'username, password, hostname, port')
+        return info(
+            username = user, password = data[1].passwd,
             hostname = host, port = port)
 
     def add_account(self, user, host, passwd, port=None, description=None):
@@ -99,17 +100,17 @@ class POP3Info():
         if self._get_account(user, host, port):
             return False
 
-        _server = self._get_host(host, port)
-        if not _server:
-            _server = Servers(hostname=host)
-        _account = Eboxes(user=user, passwd=passwd)
+        server = self._get_host(host, port)
+        if not server:
+            server = Servers(hostname=host)
+        account = Eboxes(user=user, passwd=passwd)
         if description:
-            _server.description = description
+            server.description = description
         if port:
-            _server.port = port
+            server.port = port
 
-        _server.accounts.append(_account)
-        db.session.add(_server)
+        server.accounts.append(account)
+        db.session.add(server)
         db.session.commit()
         return True
 
@@ -121,34 +122,27 @@ class POP3Info():
         :port: port number, if not default value
         :returns: True, if success.
         """
-        _data = self._get_account(user, host, port)
-        if not _data:
+        data = self._get_account(user, host, port)
+        if not data:
             return False
 
         #If host contains the only account references,
         #it must be deleted too
-        _count = db.session.query(Servers, Eboxes).\
-            outerjoin(Servers.accounts).\
-            filter(Servers.hostname == host).\
-            filter(Servers.port == port).count()
+        count = db.session.query(Servers, Eboxes).join(Servers.accounts).\
+            filter(and_(Servers.hostname == host, Servers.port == port)).count()
 
-        if _count > 1:
-            db.session.delete(_data[1])
+        if count > 1:
+            db.session.delete(data[1])
         else:
-            db.session.delete(_data[0])
+            db.session.delete(data[0])
         db.session.commit()
         return True
 
     def _get_account(self, user, host, port=None):
-        return db.session.query(Servers, Eboxes).\
-            outerjoin(Servers.accounts).\
-            filter(Servers.hostname == host).\
-            filter(Servers.port == port).\
-            filter(Eboxes.user == user).\
-            first()
+        return db.session.query(Servers, Eboxes).join(Servers.accounts).\
+            filter(and_(Servers.hostname == host, Servers.port == port,
+                Eboxes.user == user)).first()
 
     def _get_host(self, host, port=None):
-        return db.session.query(Servers).\
-            filter(Servers.hostname == host).\
-            filter(Servers.port == port).\
-            first()
+        return db.session.query(Servers).filter(and_(Servers.hostname == host,
+            Servers.port == port)).first()
