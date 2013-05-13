@@ -78,7 +78,7 @@ class POP3Info():
         :port: port number
         :returns: tuple of account info or None, if absent
         """
-        data = self._get_account(user, host, port=110)
+        data = self._get_account(user, host, port)
         if not data:
             return None
 

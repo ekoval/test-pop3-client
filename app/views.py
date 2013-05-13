@@ -117,6 +117,10 @@ def messages_headers():
         pop3 = POP3Info()
         account = pop3.get_account(
             form.account.data, form.hostname.data, form.port.data)
+        if not account:
+            flash("Can't get '{0}' account for '{1}:{2}'".format(
+                form.account.data, form.hostname.data, form.port.data), 'error')
+            return redirect(url_for('pop3_accounts_list'))
         client = POP3Client(
             account.username, account.password,
             account.hostname, account.port)
